@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oya — Group Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f9f8f5;
+  --white: #ffffff;
+  --ink: #141412;
+  --ink-mid: #4a4a42;
+  --ink-light: #8a8a7e;
+  --ink-faint: #e8e6e0;
+  --border: #e4e2db;
+  --green: #1c5c38;
+  --green-light: #e8f4ed;
+  --amber: #b86a00;
+  --red: #9b2b1a;
+  --tz-color: #1c5c38;
+  --ke-color: #006450;
+  --ug-color: #6b4c11;
+  --sl-color: #8b1a1a;
+  --ng-color: #1a3a5c;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--ink); min-height:100vh; }
+
+.topbar {
+  background:var(--green); padding:0 2.5rem; height:56px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.brand { font-family:'Libre Baskerville',serif; font-size:1.15rem; color:white; letter-spacing:0.04em; }
+.group-tag {
+  background:rgba(255,255,255,0.15); color:rgba(255,255,255,0.9);
+  font-size:0.72rem; padding:3px 12px; border-radius:20px;
+  letter-spacing:0.06em; text-transform:uppercase; margin-left:1rem;
+}
+.topbar-right { font-size:0.72rem; color:rgba(255,255,255,0.6); }
+.topbar-right span { color:rgba(255,255,255,0.9); }
+
+.page-nav {
+  background:var(--white); border-bottom:1px solid var(--border);
+  padding:0 2.5rem; display:flex; align-items:stretch; height:44px; overflow-x:auto;
+}
+.page-nav::-webkit-scrollbar { display:none; }
+.nav-tab {
+  display:flex; align-items:center; gap:6px; padding:0 18px;
+  font-family:'DM Sans',sans-serif; font-size:0.78rem; font-weight:500;
+  border:none; background:transparent; cursor:pointer; color:var(--ink-light);
+  border-bottom:2px solid transparent; white-space:nowrap;
+  transition:color .15s, border-color .15s; text-decoration:none;
+}
+.nav-tab:hover { color:var(--ink); }
+.nav-tab.active { color:var(--ink); border-bottom-color:var(--green); }
+.nav-tab.pending { color:var(--ink-light); }
+.nav-tab.pending:hover { color:var(--ink-mid); }
+.nav-dot { width:6px; height:6px; border-radius:50%; display:inline-block; flex-shrink:0; }
+.nav-dot-live { background:var(--green); }
+.nav-dot-pending { background:var(--ink-faint); }
+
+.period-bar {
+  background:var(--bg); border-bottom:1px solid var(--border);
+  padding:0 2.5rem; height:44px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.period-label { font-size:0.72rem; color:var(--ink-light); }
+.period-label strong { color:var(--ink); font-weight:500; }
+.toggle-group { display:flex; background:#e8e6e0; border-radius:8px; padding:3px; gap:2px; }
+.toggle-btn {
+  padding:5px 16px; border-radius:6px; border:none; background:transparent;
+  font-family:'DM Sans',sans-serif; font-size:0.78rem; cursor:pointer;
+  color:var(--ink-light); font-weight:500; transition:all .15s;
+}
+.toggle-btn.active { background:var(--white); color:var(--ink); box-shadow:0 1px 3px rgba(0,0,0,.1); }
+
+main { padding:2rem 2.5rem; max-width:1400px; margin:0 auto; }
+
+.section-label {
+  font-size:0.65rem; text-transform:uppercase; letter-spacing:0.1em;
+  color:var(--ink-light); margin-bottom:0.75rem; margin-top:1.75rem;
+}
+.section-label:first-child { margin-top:0; }
+
+/* 2x3 KPI GRID */
+.kpi-grid {
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:1px; background:var(--border);
+  border:1px solid var(--border); border-radius:12px; overflow:hidden;
+}
+.kpi {
+  background:var(--white); padding:1.25rem 1.4rem;
+  opacity:0; animation:fadeUp 0.4s ease forwards;
+}
+.kpi:nth-child(1){animation-delay:.05s} .kpi:nth-child(2){animation-delay:.10s}
+.kpi:nth-child(3){animation-delay:.15s} .kpi:nth-child(4){animation-delay:.20s}
+.kpi:nth-child(5){animation-delay:.25s} .kpi:nth-child(6){animation-delay:.30s}
+.kpi-label { font-size:0.65rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--ink-light); margin-bottom:0.6rem; }
+.kpi-val { font-family:'Libre Baskerville',serif; font-size:1.75rem; font-weight:400; line-height:1; margin-bottom:0.4rem; letter-spacing:-0.02em; }
+.kpi-sub { font-size:0.7rem; color:var(--ink-light); }
+
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; }
+
+.card {
+  background:var(--white); border:1px solid var(--border); border-radius:12px;
+  padding:1.4rem 1.5rem;
+  opacity:0; animation:fadeUp 0.5s ease forwards;
+}
+.card:nth-child(1){animation-delay:.35s}
+.card:nth-child(2){animation-delay:.43s}
+.card-title { font-family:'Libre Baskerville',serif; font-size:0.92rem; font-weight:400; margin-bottom:0.25rem; }
+.card-sub { font-size:0.68rem; color:var(--ink-light); margin-bottom:1.25rem; }
+
+/* FUNNEL */
+.funnel { display:flex; flex-direction:column; gap:6px; }
+.f-row { display:flex; align-items:center; gap:10px; }
+.f-label { font-size:0.72rem; color:var(--ink-mid); width:88px; flex-shrink:0; text-align:right; }
+.f-track { flex:1; height:32px; background:var(--ink-faint); border-radius:5px; overflow:hidden; }
+.f-fill {
+  height:100%; border-radius:5px;
+  display:flex; align-items:center; padding:0 10px;
+  font-size:0.75rem; font-weight:500; color:white; white-space:nowrap;
+  transition:width 0.8s cubic-bezier(0.16,1,0.3,1);
+}
+.f-pct { font-size:0.72rem; width:44px; text-align:right; color:var(--ink-light); flex-shrink:0; }
+
+/* HORIZONTAL BARS */
+.hbar-chart { display:flex; flex-direction:column; gap:12px; }
+.hbar-row { display:flex; flex-direction:column; gap:4px; }
+.hbar-header { display:flex; justify-content:space-between; align-items:center; }
+.hbar-country { display:flex; align-items:center; gap:6px; font-size:0.75rem; color:var(--ink-mid); }
+.hbar-val { font-size:0.75rem; font-weight:500; }
+.hbar-track { height:10px; background:var(--ink-faint); border-radius:5px; overflow:hidden; }
+.hbar-fill { height:100%; border-radius:5px; transition:width 0.9s cubic-bezier(0.16,1,0.3,1); }
+.hbar-pending { font-size:0.65rem; color:var(--ink-light); font-style:italic; }
+
+/* DEFAULT GAUGES */
+.gauge-country-block { margin-bottom:1rem; }
+.gauge-country-block:last-child { margin-bottom:0; }
+.gauge-country-name { font-size:0.72rem; font-weight:500; margin-bottom:6px; }
+.gauge-pair { display:flex; gap:1rem; }
+.gauge-item { flex:1; }
+.gauge-header { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px; }
+.gauge-lbl { font-size:0.65rem; color:var(--ink-light); }
+.gauge-pct { font-family:'Libre Baskerville',serif; font-size:1rem; }
+.gauge-pct.ok     { color:var(--green); }
+.gauge-pct.warn   { color:var(--amber); }
+.gauge-pct.danger { color:var(--red); }
+.gauge-pct.muted  { color:var(--ink-light); font-size:0.85rem; }
+.gauge-track { height:7px; background:var(--ink-faint); border-radius:4px; overflow:hidden; }
+.gauge-fill { height:100%; border-radius:4px; transition:width 1s cubic-bezier(0.16,1,0.3,1); }
+
+.threshold-legend {
+  display:flex; gap:12px; font-size:0.65rem; color:var(--ink-light);
+  margin-bottom:1rem; padding-bottom:0.75rem; border-bottom:1px solid var(--ink-faint);
+}
+.threshold-legend span { display:flex; align-items:center; gap:4px; }
+.swatch { width:10px; height:10px; border-radius:2px; display:inline-block; }
+
+.ok   { color:var(--green); }
+.warn { color:var(--amber); }
+.muted { color:var(--ink-light); font-style:italic; }
+
+.footer-note {
+  margin-top:2rem; padding-top:1.25rem; border-top:1px solid var(--border);
+  font-size:0.65rem; color:var(--ink-light);
+  display:flex; justify-content:space-between;
+}
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(10px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div style="display:flex;align-items:center">
+    <div class="brand">Oya</div>
+    <div class="group-tag">Group Overview</div>
+  </div>
+  <div class="topbar-right">As of <span>Feb 25, 2026</span> &nbsp;·&nbsp; All figures in <span>USD</span></div>
+</div>
+
+<div class="page-nav">
+  <button class="nav-tab active">🗺 Group Overview</button>
+  <button class="nav-tab" onclick="window.location.href='oya-tz-dashboard.html'"><span class="nav-dot nav-dot-live"></span> 🇹🇿 Tanzania</button>
+  <button class="nav-tab pending" onclick="alert('Kenya data not yet uploaded.')"><span class="nav-dot nav-dot-pending"></span> 🇰🇪 Kenya</button>
+  <button class="nav-tab pending" onclick="alert('Uganda data not yet uploaded.')"><span class="nav-dot nav-dot-pending"></span> 🇺🇬 Uganda</button>
+  <button class="nav-tab pending" onclick="alert('Sierra Leone data not yet uploaded.')"><span class="nav-dot nav-dot-pending"></span> 🇸🇱 Sierra Leone</button>
+  <button class="nav-tab pending" onclick="alert('Nigeria data not yet uploaded.')"><span class="nav-dot nav-dot-pending"></span> 🇳🇬 Nigeria</button>
+</div>
+
+<div class="period-bar">
+  <div class="period-label" id="period-label">Period: <strong>Feb 1 – Feb 25, 2026 (MTD)</strong> &nbsp;·&nbsp; Prior: Jan 1–25, 2026 &nbsp;·&nbsp; Defaults as at Feb 25, 2026</div>
+  <div class="toggle-group">
+    <button class="toggle-btn active" id="btn-mtd" onclick="setView('mtd')">MTD</button>
+    <button class="toggle-btn" id="btn-ytd" onclick="setView('ytd')">YTD</button>
+    <button class="toggle-btn" id="btn-week" onclick="setView('week')">Week</button>
+  </div>
+</div>
+
+<main>
+
+  <!-- 2x3 KPI GRID -->
+  <div class="section-label">Group Totals — Tanzania live · other countries pending</div>
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="kpi-label">Applications</div>
+      <div class="kpi-val" id="g-apps">12,198</div>
+      <div class="kpi-sub" id="g-apps-sub">TZ only &nbsp;·&nbsp; 4 countries pending</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Approval Efficiency</div>
+      <div class="kpi-val" id="g-approval">93.5%</div>
+      <div class="kpi-sub" id="g-approval-sub">TZ only</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Principal Disbursed</div>
+      <div class="kpi-val" id="g-principal">$2.35M</div>
+      <div class="kpi-sub" id="g-principal-sub">TZ only &nbsp;·&nbsp; 4 countries pending</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Total Revenue</div>
+      <div class="kpi-val ok" id="g-revenue">$711K</div>
+      <div class="kpi-sub" id="g-revenue-sub">TZ only &nbsp;·&nbsp; 4 countries pending</div>
+    </div>
+    <div class="kpi" style="border-top:3px solid var(--amber)">
+      <div class="kpi-label">Avg PAR 30</div>
+      <div class="kpi-val warn">7.71%</div>
+      <div class="kpi-sub">TZ only &nbsp;·&nbsp; as at Feb 25</div>
+    </div>
+    <div class="kpi" style="border-top:3px solid var(--amber)">
+      <div class="kpi-label">Avg Chronic Rate</div>
+      <div class="kpi-val warn">8.25%</div>
+      <div class="kpi-sub">TZ only &nbsp;·&nbsp; YTD vs Jan 1</div>
+    </div>
+  </div>
+
+  <!-- FUNNEL + PRINCIPAL -->
+  <div class="section-label">Pipeline</div>
+  <div class="two-col">
+
+    <div class="card">
+      <div class="card-title">Application Funnel</div>
+      <div class="card-sub" id="funnel-sub">Feb 1 – Feb 25, 2026 (MTD) &nbsp;·&nbsp; Tanzania only</div>
+      <div class="funnel">
+        <div class="f-row">
+          <div class="f-label">Applications</div>
+          <div class="f-track"><div class="f-fill" id="f-apps" style="width:100%;background:var(--green)">12,198</div></div>
+          <div class="f-pct">100%</div>
+        </div>
+        <div class="f-row">
+          <div class="f-label">Approvals</div>
+          <div class="f-track"><div class="f-fill" id="f-apr" style="width:93.5%;background:#48a87e">11,402</div></div>
+          <div class="f-pct" id="f-apr-pct">93.5%</div>
+        </div>
+        <div class="f-row">
+          <div class="f-label">Disbursed</div>
+          <div class="f-track"><div class="f-fill" id="f-disb" style="width:91.3%;background:#6dbf9a;color:var(--green)">11,137</div></div>
+          <div class="f-pct" id="f-disb-pct">91.3%</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Principal Disbursed by Country</div>
+      <div class="card-sub" id="disb-sub">Feb 1 – Feb 25, 2026 (MTD)</div>
+      <div class="hbar-chart">
+        <div class="hbar-row">
+          <div class="hbar-header">
+            <div class="hbar-country">🇹🇿 Tanzania</div>
+            <div class="hbar-val ok" id="hb-tz-p">$2,349,280</div>
+          </div>
+          <div class="hbar-track"><div class="hbar-fill" style="width:100%;background:var(--tz-color)"></div></div>
+        </div>
+        <div class="hbar-row">
+          <div class="hbar-header"><div class="hbar-country">🇰🇪 Kenya</div><div class="hbar-val muted">—</div></div>
+          <div class="hbar-track"><div class="hbar-fill" style="width:0%;background:var(--ke-color)"></div></div>
+          <div class="hbar-pending">Awaiting upload</div>
+        </div>
+        <div class="hbar-row">
+          <div class="hbar-header"><div class="hbar-country">🇺🇬 Uganda</div><div class="hbar-val muted">—</div></div>
+          <div class="hbar-track"><div class="hbar-fill" style="width:0%;background:var(--ug-color)"></div></div>
+          <div class="hbar-pending">Awaiting upload</div>
+        </div>
+        <div class="hbar-row">
+          <div class="hbar-header"><div class="hbar-country">🇸🇱 Sierra Leone</div><div class="hbar-val muted">—</div></div>
+          <div class="hbar-track"><div class="hbar-fill" style="width:0%;background:var(--sl-color)"></div></div>
+          <div class="hbar-pending">Awaiting upload</div>
+        </div>
+        <div class="hbar-row">
+          <div class="hbar-header"><div class="hbar-country">🇳🇬 Nigeria</div><div class="hbar-val muted">—</div></div>
+          <div class="hbar-track"><div class="hbar-fill" style="width:0%;background:var(--ng-color)"></div></div>
+          <div class="hbar-pending">Awaiting upload</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- REVENUE + PAR/CHRONIC -->
+  <div class="section-label">Revenue & Default Metrics</div>
+  <div class="two-col">
+
+    <div class="card">
+      <div class="card-title">Total Revenue by Country</div>
+      <div class="card-sub" id="rev-sub">Feb 1 – Feb 25, 2026 (MTD)</div>
+      <div class="hbar-chart">
+        <div class="hbar-row">
+          <div class="hbar-header">
+            <div class="hbar-country">🇹🇿 Tanzania</div>
+            <div class="hbar-val ok" id="hb-tz-r">$710,872</div>
+          </div>
+          <div class="hbar-track"><div class="hbar-fill" style="width:100%;background:var(--tz-color)"></div></div>
+        </div>
+        <div class="hbar-row">
+          <div class="hbar-header"><div class="hbar-country">🇰🇪 Kenya</div><div class="hbar-val muted">—</div></div>
+          <div class="hbar-track"><div class="hbar-fill" style="width:0%;background:var(--ke-color)"></div></div>
+          <div class="hbar-pending">Awaiting upload</div>
+        </div>
+        <div class="hbar-row">
+          <div class="hbar-header"><div class="hbar-country">🇺🇬 Uganda</div><div class="hbar-val muted">—</div></div>
+          <div class="hbar-track"><div class="hbar-fill" style="width:0%;background:var(--ug-color)"></div></div>
+          <div class="hbar-pending">Awaiting upload</div>
+        </div>
+        <div class="hbar-row">
+          <div class="hbar-header"><div class="hbar-country">🇸🇱 Sierra Leone</div><div class="hbar-val muted">—</div></div>
+          <div class="hbar-track"><div class="hbar-fill" style="width:0%;background:var(--sl-color)"></div></div>
+          <div class="hbar-pending">Awaiting upload</div>
+        </div>
+        <div class="hbar-row">
+          <div class="hbar-header"><div class="hbar-country">🇳🇬 Nigeria</div><div class="hbar-val muted">—</div></div>
+          <div class="hbar-track"><div class="hbar-fill" style="width:0%;background:var(--ng-color)"></div></div>
+          <div class="hbar-pending">Awaiting upload</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">PAR 30 & Chronic Rate by Country</div>
+      <div class="card-sub">As at Feb 25, 2026 &nbsp;·&nbsp; Scale 0–30%</div>
+      <div class="threshold-legend">
+        <span><span class="swatch" style="background:var(--green)"></span> ≤5% Good</span>
+        <span><span class="swatch" style="background:var(--amber)"></span> 5–10% Watch</span>
+        <span><span class="swatch" style="background:var(--red)"></span> &gt;10% Alert</span>
+      </div>
+
+      <div class="gauge-country-block">
+        <div class="gauge-country-name">🇹🇿 Tanzania</div>
+        <div class="gauge-pair">
+          <div class="gauge-item">
+            <div class="gauge-header"><span class="gauge-lbl">PAR 30</span><span class="gauge-pct warn">7.71%</span></div>
+            <div class="gauge-track"><div class="gauge-fill" style="width:25.7%;background:var(--amber)"></div></div>
+          </div>
+          <div class="gauge-item">
+            <div class="gauge-header"><span class="gauge-lbl">Chronic</span><span class="gauge-pct warn">8.25%</span></div>
+            <div class="gauge-track"><div class="gauge-fill" style="width:27.5%;background:var(--amber)"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="gauge-country-block">
+        <div class="gauge-country-name">🇰🇪 Kenya</div>
+        <div class="gauge-pair">
+          <div class="gauge-item">
+            <div class="gauge-header"><span class="gauge-lbl">PAR 30</span><span class="gauge-pct muted">—</span></div>
+            <div class="gauge-track"><div class="gauge-fill" style="width:0%"></div></div>
+          </div>
+          <div class="gauge-item">
+            <div class="gauge-header"><span class="gauge-lbl">Chronic</span><span class="gauge-pct muted">—</span></div>
+            <div class="gauge-track"><div class="gauge-fill" style="width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="gauge-country-block">
+        <div class="gauge-country-name">🇺🇬 Uganda</div>
+        <div class="gauge-pair">
+          <div class="gauge-item">
+            <div class="gauge-header"><span class="gauge-lbl">PAR 30</span><span class="gauge-pct muted">—</span></div>
+            <div class="gauge-track"><div class="gauge-fill" style="width:0%"></div></div>
+          </div>
+          <div class="gauge-item">
+            <div class="gauge-header"><span class="gauge-lbl">Chronic</span><span class="gauge-pct muted">—</span></div>
+            <div class="gauge-track"><div class="gauge-fill" style="width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="gauge-country-block">
+        <div class="gauge-country-name">🇸🇱 Sierra Leone</div>
+        <div class="gauge-pair">
+          <div class="gauge-item">
+            <div class="gauge-header"><span class="gauge-lbl">PAR 30</span><span class="gauge-pct muted">—</span></div>
+            <div class="gauge-track"><div class="gauge-fill" style="width:0%"></div></div>
+          </div>
+          <div class="gauge-item">
+            <div class="gauge-header"><span class="gauge-lbl">Chronic</span><span class="gauge-pct muted">—</span></div>
+            <div class="gauge-track"><div class="gauge-fill" style="width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="gauge-country-block">
+        <div class="gauge-country-name">🇳🇬 Nigeria</div>
+        <div class="gauge-pair">
+          <div class="gauge-item">
+            <div class="gauge-header"><span class="gauge-lbl">PAR 30</span><span class="gauge-pct muted">—</span></div>
+            <div class="gauge-track"><div class="gauge-fill" style="width:0%"></div></div>
+          </div>
+          <div class="gauge-item">
+            <div class="gauge-header"><span class="gauge-lbl">Chronic</span><span class="gauge-pct muted">—</span></div>
+            <div class="gauge-track"><div class="gauge-fill" style="width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer-note">
+    <span>Oya Microcredit &nbsp;·&nbsp; Group Dashboard &nbsp;·&nbsp; Tanzania live &nbsp;·&nbsp; Kenya, Uganda, Sierra Leone, Nigeria pending upload</span>
+    <span>Rates: TZS 2,640 &nbsp;·&nbsp; KES, UGX, SLL, NGN TBD &nbsp;·&nbsp; Default scale: 0–30%</span>
+  </div>
+
+</main>
+
+<script>
+const DATA = {
+  mtd: {
+    label: 'Period: <strong>Feb 1 – Feb 25, 2026 (MTD)</strong> &nbsp;·&nbsp; Prior: Jan 1–25, 2026 &nbsp;·&nbsp; Defaults as at Feb 25, 2026',
+    period: 'Feb 1 – Feb 25, 2026 (MTD)',
+    apps:'12,198', appsSub:'vs 11,009 Jan MTD &nbsp;·&nbsp; <span style="color:var(--green)">+10.8%</span>',
+    approval:'93.5%', approvalSub:'vs 92.9% Jan MTD &nbsp;·&nbsp; <span style="color:var(--green)">+0.6pp</span>',
+    principal:'$2.35M', principalSub:'vs $1.97M Jan MTD &nbsp;·&nbsp; <span style="color:var(--green)">+19.2%</span>',
+    revenue:'$711K', revenueSub:'vs $623K Jan MTD &nbsp;·&nbsp; <span style="color:var(--green)">+14.0%</span>',
+    fApps:'12,198', fApr:'11,402', fAprPct:'93.5%', fAprW:'93.5%',
+    fDisb:'11,137', fDisbPct:'91.3%', fDisbW:'91.3%',
+    tzP:'$2,349,280', tzR:'$710,872',
+  },
+  ytd: {
+    label: 'Period: <strong>Jan 1 – Feb 25, 2026 (YTD)</strong> &nbsp;·&nbsp; Prior: Jan 1 – Feb 25, 2025 (n/a) &nbsp;·&nbsp; Defaults as at Feb 25, 2026',
+    period: 'Jan 1 – Feb 25, 2026 (YTD)',
+    apps:'26,556', appsSub:'Jan 1 – Feb 25, 2026 &nbsp;·&nbsp; prior year n/a',
+    approval:'95.1%', approvalSub:'25,250 approvals / 26,556 applications',
+    principal:'$5.10M', principalSub:'Jan 1 – Feb 25, 2026 &nbsp;·&nbsp; prior year n/a',
+    revenue:'$1.54M', revenueSub:'Interest $1.28M + Fees $255K',
+    fApps:'26,556', fApr:'25,250', fAprPct:'95.1%', fAprW:'95.1%',
+    fDisb:'24,987', fDisbPct:'94.1%', fDisbW:'94.1%',
+    tzP:'$5,099,811', tzR:'$1,536,580',
+  },
+  week: {
+    label: 'Period: <strong>Feb 19 – Feb 25, 2026 (Week)</strong> &nbsp;·&nbsp; Prior week: Feb 12–18, 2026 &nbsp;·&nbsp; Defaults as at Feb 25, 2026',
+    period: 'Feb 19 – Feb 25, 2026 (Week)',
+    apps:'3,463', appsSub:'vs 3,248 prior week &nbsp;·&nbsp; <span style="color:var(--green)">+6.6%</span>',
+    approval:'107.8%', approvalSub:'vs 76.2% prior week &nbsp;·&nbsp; approvals lag applications',
+    principal:'$1.29M', principalSub:'vs $0 prior week &nbsp;·&nbsp; <span style="color:var(--ink-light)">disbursements are batched</span>',
+    revenue:'$254K', revenueSub:'vs $166K prior week &nbsp;·&nbsp; <span style="color:var(--green)">+53.3%</span>',
+    fApps:'3,463', fApr:'3,734', fAprPct:'107.8%', fAprW:'100%',
+    fDisb:'5,883', fDisbPct:'—', fDisbW:'100%',
+    tzP:'$1,285,417', tzR:'$254,105',
+  }
+};
+
+function setView(v) {
+  const d = DATA[v];
+  ['mtd','ytd','week'].forEach(k => document.getElementById('btn-'+k).classList.toggle('active', k===v));
+  document.getElementById('period-label').innerHTML = d.label;
+  document.getElementById('g-apps').textContent        = d.apps;
+  document.getElementById('g-apps-sub').innerHTML      = d.appsSub;
+  document.getElementById('g-approval').textContent    = d.approval;
+  document.getElementById('g-approval-sub').innerHTML  = d.approvalSub;
+  document.getElementById('g-principal').textContent   = d.principal;
+  document.getElementById('g-principal-sub').innerHTML = d.principalSub;
+  document.getElementById('g-revenue').textContent     = d.revenue;
+  document.getElementById('g-revenue-sub').innerHTML   = d.revenueSub;
+  document.getElementById('funnel-sub').textContent    = d.period + ' · Tanzania only';
+  document.getElementById('f-apps').textContent        = d.fApps;
+  document.getElementById('f-apr').textContent         = d.fApr;
+  document.getElementById('f-apr').style.width         = d.fAprW;
+  document.getElementById('f-apr-pct').textContent     = d.fAprPct;
+  document.getElementById('f-disb').textContent        = d.fDisb;
+  document.getElementById('f-disb').style.width        = d.fDisbW;
+  document.getElementById('f-disb-pct').textContent    = d.fDisbPct;
+  document.getElementById('disb-sub').textContent      = d.period;
+  document.getElementById('hb-tz-p').textContent       = d.tzP;
+  document.getElementById('rev-sub').textContent       = d.period;
+  document.getElementById('hb-tz-r').textContent       = d.tzR;
+}
+
+window.onload = () => setView('mtd');
+</script>
+</body>
+</html>
