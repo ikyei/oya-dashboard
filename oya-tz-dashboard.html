@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oya — Tanzania Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f9f8f5;
+  --white: #ffffff;
+  --ink: #141412;
+  --ink-mid: #4a4a42;
+  --ink-light: #8a8a7e;
+  --ink-faint: #e8e6e0;
+  --green: #1c5c38;
+  --green-mid: #2e7d4f;
+  --green-light: #e8f4ed;
+  --amber: #b86a00;
+  --amber-light: #fdf3e3;
+  --red: #9b2b1a;
+  --red-light: #fdf0ee;
+  --border: #e4e2db;
+  --tz: #1c5c38;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+/* ── HEADER ── */
+.topbar {
+  background: var(--green);
+  padding: 0 2.5rem;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.topbar-left { display: flex; align-items: center; gap: 1.5rem; }
+.brand {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1.15rem;
+  color: white;
+  letter-spacing: 0.04em;
+}
+.country-tag {
+  background: rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.9);
+  font-size: 0.72rem;
+  padding: 3px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.topbar-right {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.6);
+  letter-spacing: 0.04em;
+}
+.topbar-right span { color: rgba(255,255,255,0.9); }
+
+/* ── PERIOD BAR ── */
+.page-nav {
+  background:var(--white); border-bottom:1px solid var(--border);
+  padding:0 2.5rem; display:flex; align-items:stretch; height:44px; overflow-x:auto;
+}
+.page-nav::-webkit-scrollbar { display:none; }
+.nav-tab {
+  display:flex; align-items:center; gap:6px; padding:0 18px;
+  font-family:'DM Sans',sans-serif; font-size:0.78rem; font-weight:500;
+  border:none; background:transparent; cursor:pointer; color:var(--ink-light);
+  border-bottom:2px solid transparent; white-space:nowrap;
+  transition:color .15s, border-color .15s;
+}
+.nav-tab:hover { color:var(--ink); }
+.nav-tab.active { color:var(--ink); border-bottom-color:var(--green); }
+.nav-tab.pending { color:var(--ink-light); }
+.nav-tab.pending:hover { color:var(--ink-mid); }
+.nav-dot { width:6px; height:6px; border-radius:50%; display:inline-block; flex-shrink:0; }
+.nav-dot-live { background:var(--green); }
+.nav-dot-pending { background:var(--ink-faint); }
+
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2.5rem;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.period-label {
+  font-size: 0.72rem;
+  color: var(--ink-light);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+.period-label strong { color: var(--ink); font-weight: 500; }
+.data-note {
+  font-size: 0.68rem;
+  color: var(--ink-light);
+  font-style: italic;
+}
+
+/* ── MAIN ── */
+main { padding: 2rem 2.5rem; max-width: 1400px; margin: 0 auto; }
+
+/* ── SECTION LABEL ── */
+.section-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-light);
+  margin-bottom: 0.75rem;
+  margin-top: 1.75rem;
+}
+.section-label:first-child { margin-top: 0; }
+
+/* ── KPI STRIP ── */
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 0.25rem;
+}
+.kpi {
+  background: var(--white);
+  padding: 1.25rem 1.4rem;
+  opacity: 0;
+  animation: fadeUp 0.4s ease forwards;
+}
+.kpi:nth-child(1){animation-delay:.05s}
+.kpi:nth-child(2){animation-delay:.10s}
+.kpi:nth-child(3){animation-delay:.15s}
+.kpi:nth-child(4){animation-delay:.20s}
+.kpi:nth-child(5){animation-delay:.25s}
+.kpi-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-light);
+  margin-bottom: 0.6rem;
+}
+.kpi-val {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1.75rem;
+  font-weight: 400;
+  line-height: 1;
+  margin-bottom: 0.4rem;
+  letter-spacing: -0.02em;
+}
+.kpi-sub {
+  font-size: 0.7rem;
+  color: var(--ink-light);
+}
+
+/* ── TWO COL ── */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.25rem; }
+
+/* ── CARD ── */
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.4rem 1.5rem;
+  opacity: 0;
+  animation: fadeUp 0.5s ease forwards;
+}
+.card:nth-child(1){animation-delay:.3s}
+.card:nth-child(2){animation-delay:.38s}
+.card:nth-child(3){animation-delay:.46s}
+.card-title {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.92rem;
+  font-weight: 400;
+  margin-bottom: 0.3rem;
+}
+.card-sub {
+  font-size: 0.68rem;
+  color: var(--ink-light);
+  margin-bottom: 1.25rem;
+}
+
+/* ── FUNNEL ── */
+.funnel { display: flex; flex-direction: column; gap: 5px; }
+.f-row { display: flex; align-items: center; gap: 10px; }
+.f-label { font-size: 0.72rem; color: var(--ink-mid); width: 88px; flex-shrink: 0; text-align: right; }
+.f-track { flex: 1; height: 32px; background: var(--ink-faint); border-radius: 5px; overflow: hidden; position: relative; }
+.f-fill {
+  height: 100%;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: white;
+  white-space: nowrap;
+  transition: width 0.8s cubic-bezier(0.16,1,0.3,1);
+}
+.f-pct { font-size: 0.72rem; width: 44px; text-align: right; color: var(--ink-light); flex-shrink: 0; }
+/* threshold: green ≤5%, amber >5%–10%, red >10% */
+
+/* ── DEFAULT GAUGES ── */
+.gauge-wrap { display: flex; flex-direction: column; gap: 1.5rem; }
+.gauge-item {}
+.gauge-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.5rem;
+}
+.gauge-name { font-size: 0.78rem; font-weight: 500; }
+.gauge-pct {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1.4rem;
+  font-weight: 400;
+}
+.gauge-pct.warn { color: var(--amber); }
+.gauge-pct.danger { color: var(--red); }
+.gauge-pct.ok { color: var(--green); }
+.gauge-track {
+  height: 8px;
+  background: var(--ink-faint);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.35rem;
+}
+.gauge-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 1s cubic-bezier(0.16,1,0.3,1);
+}
+.gauge-detail { font-size: 0.67rem; color: var(--ink-light); }
+
+/* ── VOLUME TABLE ── */
+.vol-table { width: 100%; border-collapse: collapse; }
+.vol-table tr td {
+  padding: 0.55rem 0;
+  font-size: 0.82rem;
+  border-bottom: 1px solid var(--ink-faint);
+}
+.vol-table tr:last-child td { border-bottom: none; }
+.vol-table td:last-child { text-align: right; font-weight: 500; }
+.vol-table tr.total td {
+  font-weight: 600;
+  border-top: 2px solid var(--border);
+  border-bottom: none;
+  padding-top: 0.75rem;
+  font-size: 0.86rem;
+}
+.vol-table .row-label { color: var(--ink-mid); }
+.vol-table .row-sub { font-size: 0.65rem; color: var(--ink-light); display: block; }
+.pos { color: var(--green); }
+.neg { color: var(--red); }
+
+/* ── CHRONIC DETAIL ── */
+.chronic-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.chronic-cell {
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 1rem;
+}
+.chronic-cell-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-light); margin-bottom: 0.4rem; }
+.chronic-cell-val { font-family: 'Libre Baskerville', serif; font-size: 1.2rem; }
+.chronic-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  color: var(--ink-light);
+  margin-top: 1rem;
+}
+
+/* ── FOOTER NOTE ── */
+.footer-note {
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.65rem;
+  color: var(--ink-light);
+  display: flex;
+  justify-content: space-between;
+}
+
+@keyframes fadeUp {
+  from { opacity:0; transform: translateY(10px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+
+@media(max-width:1100px) { .kpi-strip { grid-template-columns: repeat(3,1fr); } }
+@media(max-width:900px)  { .two-col, .three-col { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div class="topbar" style="position:relative">
+  <div class="topbar-left">
+    <div class="brand">Oya</div>
+    <div class="country-tag">🇹🇿 Tanzania</div>
+  </div>
+  <div class="topbar-right">
+    As of <span>Feb 25, 2026</span> &nbsp;·&nbsp; All figures in <span>USD</span> &nbsp;·&nbsp; Rate: <span>1 USD = TZS 2,640</span>
+  </div>
+</div>
+
+<div class="page-nav">
+  <button class="nav-tab" onclick="window.location.href='oya-consolidated.html'">🗺 Group Overview</button>
+  <button class="nav-tab active"><span class="nav-dot nav-dot-live"></span> 🇹🇿 Tanzania</button>
+  <button class="nav-tab pending" onclick="alert('Kenya data not yet uploaded.')"><span class="nav-dot nav-dot-pending"></span> 🇰🇪 Kenya</button>
+  <button class="nav-tab pending" onclick="alert('Uganda data not yet uploaded.')"><span class="nav-dot nav-dot-pending"></span> 🇺🇬 Uganda</button>
+  <button class="nav-tab pending" onclick="alert('Sierra Leone data not yet uploaded.')"><span class="nav-dot nav-dot-pending"></span> 🇸🇱 Sierra Leone</button>
+  <button class="nav-tab pending" onclick="alert('Nigeria data not yet uploaded.')"><span class="nav-dot nav-dot-pending"></span> 🇳🇬 Nigeria</button>
+</div>
+
+<div class="period-bar">
+  <div style="display:flex;align-items:center;gap:1rem">
+    <div class="period-label" id="period-label">Period: <strong>Feb 1 – Feb 25, 2026 (MTD)</strong> &nbsp;·&nbsp; Prior: Jan 1–25, 2026 &nbsp;·&nbsp; Defaults as at Feb 25, 2026</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:1rem">
+    <div style="display:flex;align-items:center;gap:6px">
+      <label style="font-size:0.68rem;color:var(--ink-light);text-transform:uppercase;letter-spacing:0.07em">Report date</label>
+      <input type="date" id="report-date" value="2026-02-25"
+        style="font-family:'DM Sans',sans-serif;font-size:0.78rem;border:1px solid var(--border);
+               border-radius:6px;padding:4px 8px;background:white;color:var(--ink);cursor:pointer;
+               outline:none;"
+        onchange="onDateChange(this.value)">
+    </div>
+    <div style="display:flex;background:#f3f4f6;border-radius:8px;padding:3px;gap:2px">
+      <button class="toggle-btn" id="btn-week" onclick="setView('week')">Week</button>
+      <button class="toggle-btn active" id="btn-mtd" onclick="setView('mtd')">MTD</button>
+      <button class="toggle-btn" id="btn-ytd" onclick="setView('ytd')">YTD</button>
+    </div>
+    <div class="data-note" id="data-source-note">Loading live data...</div>
+  </div>
+</div>
+<style>
+.toggle-btn {
+  padding: 5px 16px; border-radius: 6px; border: none; background: transparent;
+  font-family: 'DM Sans', sans-serif; font-size: 0.78rem; cursor: pointer;
+  color: var(--ink-light); transition: all .15s; font-weight: 500;
+}
+.toggle-btn.active {
+  background: var(--white); color: var(--ink);
+  box-shadow: 0 1px 3px rgba(0,0,0,.1);
+}
+</style>
+
+<div id="date-warning" style="display:none;background:#fdf3e3;border-bottom:1px solid #f0d9b5;padding:8px 2.5rem;font-size:0.72rem;color:var(--amber);gap:8px;align-items:center;"></div>
+
+<main>
+
+  <!-- KPI STRIP -->
+  <div class="section-label">Key Metrics</div>
+  <div class="kpi-strip" style="grid-template-columns:repeat(3,1fr); margin-bottom:1px">
+    <div class="kpi">
+      <div class="kpi-label">Applications</div>
+      <div class="kpi-val" id="kpi-apps">12,198</div>
+      <div class="kpi-sub" id="kpi-apps-sub">vs 11,009 prior MTD &nbsp;·&nbsp; <span style="color:var(--green)">+10.8%</span></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Approval Efficiency</div>
+      <div class="kpi-val" id="kpi-approval">93.5%</div>
+      <div class="kpi-sub" id="kpi-approval-sub">vs 92.9% prior MTD &nbsp;·&nbsp; <span style="color:var(--green)">+0.6pp</span></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Principal Disbursed</div>
+      <div class="kpi-val" id="kpi-principal">$2.35M</div>
+      <div class="kpi-sub" id="kpi-principal-sub">vs $1.97M prior MTD &nbsp;·&nbsp; <span style="color:var(--green)">+19.2%</span></div>
+    </div>
+  </div>
+  <div class="kpi-strip" style="grid-template-columns:repeat(3,1fr)">
+    <div class="kpi" style="border-top: 3px solid var(--green)">
+      <div class="kpi-label">Total Revenue</div>
+      <div class="kpi-val" id="kpi-revenue" style="color:var(--green)">$711K</div>
+      <div class="kpi-sub" id="kpi-revenue-sub">vs $623K prior MTD &nbsp;·&nbsp; <span style="color:var(--green)">+14.0%</span></div>
+    </div>
+    <div class="kpi" style="border-top: 3px solid var(--amber)">
+      <div class="kpi-label">PAR 30</div>
+      <div class="kpi-val" data-metric="par30" style="color:var(--amber)">—</div>
+      <div class="kpi-sub" data-metric="par30-sub">Loading...</div>
+    </div>
+    <div class="kpi" style="border-top: 3px solid var(--amber)">
+      <div class="kpi-label">Chronic Rate (YTD)</div>
+      <div class="kpi-val" data-metric="chronic" style="color:var(--amber)">—</div>
+      <div class="kpi-sub" data-metric="chronic-sub">Loading...</div>
+    </div>
+  </div>
+
+  <!-- REVENUE -->
+  <div class="section-label">Revenue</div>
+  <div class="kpi-strip" style="grid-template-columns: repeat(3,1fr); margin-bottom:1.5rem">
+    <div class="kpi">
+      <div class="kpi-label">Interest Income (Cash)</div>
+      <div class="kpi-val" id="rev-interest">$593,408</div>
+      <div class="kpi-sub" id="rev-interest-sub">vs $524,809 prior MTD &nbsp;·&nbsp; <span style="color:var(--green)">+13.1%</span></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Processing Fees</div>
+      <div class="kpi-val" id="rev-fees">$117,464</div>
+      <div class="kpi-sub" id="rev-fees-sub">vs $98,521 prior MTD &nbsp;·&nbsp; <span style="color:var(--green)">+19.2%</span></div>
+    </div>
+    <div class="kpi" style="border-top: 3px solid var(--green)">
+      <div class="kpi-label">Total Revenue</div>
+      <div class="kpi-val" id="rev-total" style="color:var(--green)">$710,872</div>
+      <div class="kpi-sub" id="rev-total-sub">vs $623,330 prior MTD &nbsp;·&nbsp; <span style="color:var(--green)">+14.0%</span></div>
+    </div>
+  </div>
+
+  <div class="section-label" style="margin-top:1.5rem">Loan Pipeline & Disbursement</div>
+  <div class="two-col">
+
+    <!-- FUNNEL -->
+    <div class="card">
+      <div class="card-title">Application Funnel</div>
+      <div class="card-sub" id="f-sub">Report totals &nbsp;·&nbsp; Feb 1 – Feb 25, 2026 (MTD)</div>
+      <div class="funnel">
+
+        <div class="f-row">
+          <div class="f-label">Applications</div>
+          <div class="f-track">
+            <div class="f-fill" id="f-apps-bar" style="width:100%;background:var(--green)" id="f-apps-bar"><span id="f-apps-val">12,198</span></div>
+          </div>
+          <div class="f-pct" id="f-apps-pct">100%</div>
+        </div>
+
+        <div class="f-row">
+          <div class="f-label">Approvals</div>
+          <div class="f-track">
+            <div class="f-fill" id="f-apr-bar" style="width:93.5%;background:#48a87e"><span id="f-apr-val">11,402</span></div>
+          </div>
+          <div class="f-pct" id="f-apr-pct">93.5%</div>
+        </div>
+
+        <div class="f-row">
+          <div class="f-label">Disbursed</div>
+          <div class="f-track">
+            <div class="f-fill" id="f-disb-bar" style="width:91.3%;background:#6dbf9a;color:var(--green)"><span id="f-disb-val">11,137</span></div>
+          </div>
+          <div class="f-pct" id="f-disb-pct">91.3%</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- VOLUMES -->
+    <div class="card">
+      <div class="card-title">Disbursement Breakdown</div>
+      <div class="card-sub" id="disb-sub">Feb 1 – Feb 25, 2026 (MTD) &nbsp;·&nbsp; USD values at TZS 2,640</div>
+      <table class="vol-table">
+        <tr><td class="row-label">Loans disbursed</td><td id="d-count">11,137</td></tr>
+        <tr><td class="row-label">Total principal<span class="row-sub">Amount lent to customers</span></td><td class="pos" id="d-principal">$2,349,280</td></tr>
+        <tr><td class="row-label">Total interest due<span class="row-sub">Gross interest on disbursed loans</span></td><td id="d-interest">$839,708</td></tr>
+        <tr><td class="row-label">Total P+I<span class="row-sub">Principal + interest</span></td><td id="d-pi">$3,188,988</td></tr>
+        <tr><td class="row-label">Fees collected<span class="row-sub">Upfront processing fees</span></td><td id="d-fees">$117,464</td></tr>
+        <tr><td class="row-label">Avg loan size</td><td id="d-avg">$211</td></tr>
+        <tr class="total"><td>Total revenue potential<span class="row-sub">Interest + fees</span></td><td class="pos" id="d-rev">$957,172</td></tr>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- DEFAULTS -->
+  <div class="section-label">Default Metrics</div>
+  <div class="three-col">
+
+    <!-- PAR 30 -->
+    <div class="card">
+      <div class="card-title">PAR 30</div>
+      <div class="card-sub">Portfolio at risk &gt; 30 days overdue</div>
+      <div class="gauge-wrap">
+        <div class="gauge-item">
+          <div class="gauge-header">
+            <div class="gauge-name">PAR 30 Rate</div>
+            <div class="gauge-pct warn" data-metric="par30">—</div>
+          </div>
+          <div class="gauge-track">
+            <!-- scale: 0–20% max for visual clarity -->
+            <div class="gauge-fill" style="width:25.7%;background:var(--amber)"></div>
+          </div>
+          <div class="gauge-detail">Cohort: loans disbursed May 31 – Dec 27, 2025 &nbsp;·&nbsp; Scale: 0–30%</div>
+        </div>
+        <table class="vol-table">
+          <tr>
+            <td class="row-label">Loans in cohort</td>
+            <td>14,757</td>
+          </tr>
+          <tr>
+            <td class="row-label">Loans at risk (&gt;30d)</td>
+            <td class="neg">9,362</td>
+          </tr>
+          <tr>
+            <td class="row-label">Outstanding P+I at risk</td>
+            <td class="neg">$1,325,420</td>
+          </tr>
+          <tr class="total">
+            <td>Total cohort P+I</td>
+            <td>$17,182,746</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- CHRONIC RATE -->
+    <div class="card">
+      <div class="card-title">Chronic Rate</div>
+      <div class="card-sub">YTD growth in chronic balance vs Jan 1 baseline</div>
+      <div class="gauge-wrap">
+        <div class="gauge-item">
+          <div class="gauge-header">
+            <div class="gauge-name">Chronic Rate (YTD)</div>
+            <div class="gauge-pct warn" data-metric="chronic">—</div>
+          </div>
+          <div class="gauge-track">
+            <div class="gauge-fill" style="width:27.5%;background:var(--amber)"></div>
+          </div>
+          <div class="gauge-detail">Cohort: disbursed Aug 20, 2024 – Oct 14, 2025 &nbsp;·&nbsp; Scale: 0–30%</div>
+        </div>
+        <div class="chronic-split">
+          <div class="chronic-cell">
+            <div class="chronic-cell-label">Chronic Jan 1</div>
+            <div class="chronic-cell-val">$4,748,054</div>
+          </div>
+          <div class="chronic-cell">
+            <div class="chronic-cell-label">Chronic Feb 25</div>
+            <div class="chronic-cell-val">$5,123,463</div>
+          </div>
+        </div>
+        <div style="margin-top:1rem">
+          <table class="vol-table">
+            <tr>
+              <td class="row-label">New chronic YTD</td>
+              <td class="neg">$375,409</td>
+            </tr>
+            <tr class="total">
+              <td>Denominator (cohort P+I)</td>
+              <td>$4,552,445</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMBINED VIEW -->
+    <div class="card">
+      <div class="card-title">Default Summary</div>
+      <div class="card-sub">Both metrics side by side</div>
+      <div class="gauge-wrap">
+        <div style="display:flex;gap:12px;margin-bottom:1rem;font-size:0.65rem;">
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--green);display:inline-block"></span> ≤5%</span>
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--amber);display:inline-block"></span> 5–10%</span>
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--red);display:inline-block"></span> &gt;10%</span>
+        </div>
+        <div class="gauge-item">
+          <div class="gauge-header">
+            <div class="gauge-name">PAR 30</div>
+            <div class="gauge-pct warn" data-metric="par30">—</div>
+          </div>
+          <div class="gauge-track" style="height:12px">
+            <div class="gauge-fill" style="width:25.7%;background:var(--amber)"></div>
+          </div>
+          <div class="gauge-detail" style="margin-top:4px">Point-in-time &nbsp;·&nbsp; 2–9 month cohort &nbsp;·&nbsp; $1.33M at risk</div>
+        </div>
+        <div class="gauge-item" style="margin-top:1.25rem">
+          <div class="gauge-header">
+            <div class="gauge-name">Chronic Rate</div>
+            <div class="gauge-pct warn" data-metric="chronic">—</div>
+          </div>
+          <div class="gauge-track" style="height:12px">
+            <div class="gauge-fill" style="width:27.5%;background:var(--amber)"></div>
+          </div>
+          <div class="gauge-detail" style="margin-top:4px">YTD accumulation &nbsp;·&nbsp; vs Jan 1 baseline &nbsp;·&nbsp; $375K new</div>
+        </div>
+        <div style="margin-top:1.5rem;padding:1rem;background:var(--amber-light);border-radius:8px;font-size:0.72rem;color:var(--amber);line-height:1.5">
+          Both metrics are elevated but within manageable range for a microfinance portfolio. Chronic rate trending above PAR 30 suggests a growing tail of long-term defaulters.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer-note">
+    <span>Oya Microcredit &nbsp;·&nbsp; Tanzania &nbsp;·&nbsp; Proviso Cloud &nbsp;·&nbsp; Report totals (not cohort-matched across funnel stages)</span>
+    <span>Exchange rate: 1 USD = TZS 2,640 &nbsp;·&nbsp; Loan term: 84 days / 12 weekly instalments &nbsp;·&nbsp; Chronic threshold: 50 days post-expiry</span>
+  </div>
+
+</main>
+<script>
+// ── LIVE DATA FROM GOOGLE SHEETS ──
+const SHEET_ID = '1y0klKJTbTeStl2z9iLtBZFcKRNoDJ-WAzw7XabfVCGU';
+const COUNTRY  = 'TZ';
+let DATA = { mtd: {}, ytd: {}, week: {} };
+let liveRow = null;
+
+function fmt(n, decimals=0) {
+  if (n == null || isNaN(n)) return '—';
+  return Number(n).toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+}
+function fmtUSD(n) {
+  if (n == null || isNaN(n)) return '—';
+  if (Math.abs(n) >= 1e6) return '$' + (n/1e6).toFixed(2) + 'M';
+  if (Math.abs(n) >= 1e3) return '$' + (n/1e3).toFixed(0) + 'K';
+  return '$' + fmt(n);
+}
+function fmtPct(n, decimals=1) {
+  if (n == null || isNaN(n)) return '—';
+  return Number(n).toFixed(decimals) + '%';
+}
+function chg(curr, prior, isRate=false) {
+  if (!curr || !prior || prior === 0) return '';
+  const diff = curr - prior;
+  const pct  = diff / prior * 100;
+  const color = diff >= 0 ? 'var(--green)' : 'var(--red)';
+  const sign  = diff >= 0 ? '+' : '';
+  if (isRate) return `<span style="color:${color}">${sign}${Math.abs(diff).toFixed(1)}pp</span>`;
+  return `<span style="color:${color}">${sign}${pct.toFixed(1)}%</span>`;
+}
+
+function buildDATA(row) {
+  // row is the TZ results row object keyed by column name
+  const r = row;
+  const ex = parseFloat(r.exchange_rate) || 2640;
+  const exLabel = 'TZS ' + fmt(ex);
+
+  DATA = {
+    mtd: {
+      apps:        fmt(r.mtd_apps),
+      appsSub:     'vs ' + fmt(r.prior_mtd_apps) + ' prior MTD &nbsp;·&nbsp; ' + chg(r.mtd_apps, r.prior_mtd_apps),
+      approval:    fmtPct(r.mtd_approval_rate),
+      approvalSub: fmt(r.mtd_approvals) + ' approvals / ' + fmt(r.mtd_apps) + ' applications',
+      principal:   fmtUSD(r.mtd_principal_usd),
+      principalSub:'vs ' + fmtUSD(r.prior_mtd_principal_usd) + ' prior MTD &nbsp;·&nbsp; ' + chg(r.mtd_principal_usd, r.prior_mtd_principal_usd),
+      revenue:     fmtUSD(r.mtd_revenue_usd),
+      revenueSub:  'vs ' + fmtUSD(r.prior_mtd_revenue_usd) + ' prior MTD &nbsp;·&nbsp; ' + chg(r.mtd_revenue_usd, r.prior_mtd_revenue_usd),
+      revInterest: '$' + fmt(r.mtd_interest_usd, 0),
+      revInterestSub: 'vs $' + fmt(r.prior_mtd_interest_usd, 0) + ' prior MTD &nbsp;·&nbsp; ' + chg(r.mtd_interest_usd, r.prior_mtd_interest_usd),
+      revFees:     '$' + fmt(r.mtd_fees_usd, 0),
+      revFeesSub:  'vs $' + fmt(r.prior_mtd_fees_usd, 0) + ' prior MTD &nbsp;·&nbsp; ' + chg(r.mtd_fees_usd, r.prior_mtd_fees_usd),
+      revTotal:    '$' + fmt(r.mtd_revenue_usd, 0),
+      revTotalSub: 'vs $' + fmt(r.prior_mtd_revenue_usd, 0) + ' prior MTD &nbsp;·&nbsp; ' + chg(r.mtd_revenue_usd, r.prior_mtd_revenue_usd),
+      fApps: fmt(r.mtd_apps), fApps_pct: '100%',
+      fApr:  fmt(r.mtd_approvals), fApr_pct: fmtPct(r.mtd_approval_rate), fApr_w: Math.min(100, r.mtd_approval_rate) + '%',
+      fDisb: fmt(r.mtd_disbursements), fDisb_pct: r.mtd_apps > 0 ? fmtPct(r.mtd_disbursements/r.mtd_apps*100) : '—', fDisb_w: Math.min(100, r.mtd_disbursements/r.mtd_apps*100) + '%',
+      dCount: fmt(r.mtd_disbursements), dPrincipal: '$' + fmt(r.mtd_principal_usd, 0),
+      dInterest: '$' + fmt(r.mtd_interest_usd, 0), dPI: '$' + fmt((parseFloat(r.mtd_principal_usd)||0)+(parseFloat(r.mtd_interest_usd)||0), 0),
+      dFees: '$' + fmt(r.mtd_fees_usd, 0), dAvg: '$' + fmt(r.mtd_disbursements > 0 ? r.mtd_principal_usd/r.mtd_disbursements : 0, 0),
+      dRev: '$' + fmt((parseFloat(r.mtd_principal_usd)||0)+(parseFloat(r.mtd_interest_usd)||0)+(parseFloat(r.mtd_fees_usd)||0), 0),
+      disbSub: 'MTD &nbsp;·&nbsp; USD values at ' + exLabel,
+    },
+    ytd: {
+      apps:        fmt(r.ytd_apps),
+      appsSub:     'Jan 1 – ' + formatDate(reportDate),
+      approval:    fmtPct(r.ytd_approval_rate),
+      approvalSub: fmt(r.ytd_approvals) + ' approvals / ' + fmt(r.ytd_apps) + ' applications',
+      principal:   fmtUSD(r.ytd_principal_usd),
+      principalSub:'Jan 1 – ' + formatDate(reportDate),
+      revenue:     fmtUSD(r.ytd_revenue_usd),
+      revenueSub:  'Interest ' + fmtUSD(r.ytd_interest_usd) + ' + Fees ' + fmtUSD(r.ytd_fees_usd),
+      revInterest: '$' + fmt(r.ytd_interest_usd, 0),
+      revInterestSub: 'Jan 1 – ' + formatDate(reportDate),
+      revFees:     '$' + fmt(r.ytd_fees_usd, 0),
+      revFeesSub:  'Jan 1 – ' + formatDate(reportDate),
+      revTotal:    '$' + fmt(r.ytd_revenue_usd, 0),
+      revTotalSub: 'Jan 1 – ' + formatDate(reportDate),
+      fApps: fmt(r.ytd_apps), fApps_pct: '100%',
+      fApr:  fmt(r.ytd_approvals), fApr_pct: fmtPct(r.ytd_approval_rate), fApr_w: Math.min(100, r.ytd_approval_rate) + '%',
+      fDisb: fmt(r.ytd_disbursements), fDisb_pct: r.ytd_apps > 0 ? fmtPct(r.ytd_disbursements/r.ytd_apps*100) : '—', fDisb_w: Math.min(100, r.ytd_disbursements/r.ytd_apps*100) + '%',
+      dCount: fmt(r.ytd_disbursements), dPrincipal: '$' + fmt(r.ytd_principal_usd, 0),
+      dInterest: '$' + fmt(r.ytd_interest_usd, 0), dPI: '$' + fmt((parseFloat(r.ytd_principal_usd)||0)+(parseFloat(r.ytd_interest_usd)||0), 0),
+      dFees: '$' + fmt(r.ytd_fees_usd, 0), dAvg: '$' + fmt(r.ytd_disbursements > 0 ? r.ytd_principal_usd/r.ytd_disbursements : 0, 0),
+      dRev: '$' + fmt((parseFloat(r.ytd_principal_usd)||0)+(parseFloat(r.ytd_interest_usd)||0)+(parseFloat(r.ytd_fees_usd)||0), 0),
+      disbSub: 'YTD &nbsp;·&nbsp; USD values at ' + exLabel,
+    },
+    week: {
+      apps:        fmt(r.week_apps),
+      appsSub:     'vs ' + fmt(r.prior_week_apps) + ' prior week &nbsp;·&nbsp; ' + chg(r.week_apps, r.prior_week_apps),
+      approval:    fmtPct(r.week_approval_rate),
+      approvalSub: fmt(r.week_approvals) + ' approvals / ' + fmt(r.week_apps) + ' applications',
+      principal:   fmtUSD(r.week_principal_usd),
+      principalSub:'vs ' + fmtUSD(r.prior_week_principal_usd) + ' prior week &nbsp;·&nbsp; ' + chg(r.week_principal_usd, r.prior_week_principal_usd),
+      revenue:     fmtUSD(r.week_revenue_usd),
+      revenueSub:  'vs ' + fmtUSD(r.prior_week_revenue_usd) + ' prior week &nbsp;·&nbsp; ' + chg(r.week_revenue_usd, r.prior_week_revenue_usd),
+      revInterest: '$' + fmt(r.week_interest_usd, 0),
+      revInterestSub: 'vs $' + fmt(r.prior_week_interest_usd, 0) + ' prior week &nbsp;·&nbsp; ' + chg(r.week_interest_usd, r.prior_week_interest_usd),
+      revFees:     '$' + fmt(r.week_fees_usd, 0),
+      revFeesSub:  'vs $' + fmt(r.prior_week_fees_usd, 0) + ' prior week',
+      revTotal:    '$' + fmt(r.week_revenue_usd, 0),
+      revTotalSub: 'vs $' + fmt(r.prior_week_revenue_usd, 0) + ' prior week &nbsp;·&nbsp; ' + chg(r.week_revenue_usd, r.prior_week_revenue_usd),
+      fApps: fmt(r.week_apps), fApps_pct: '100%',
+      fApr:  fmt(r.week_approvals), fApr_pct: fmtPct(r.week_approval_rate), fApr_w: Math.min(100, r.week_approval_rate) + '%',
+      fDisb: fmt(r.week_disbursements), fDisb_pct: r.week_apps > 0 ? fmtPct(r.week_disbursements/r.week_apps*100) : '—', fDisb_w: Math.min(100, r.week_disbursements/r.week_apps*100) + '%',
+      dCount: fmt(r.week_disbursements), dPrincipal: '$' + fmt(r.week_principal_usd, 0),
+      dInterest: '$' + fmt(r.week_interest_usd, 0), dPI: '$' + fmt((parseFloat(r.week_principal_usd)||0)+(parseFloat(r.week_interest_usd)||0), 0),
+      dFees: '$' + fmt(r.week_fees_usd, 0), dAvg: '$' + fmt(r.week_disbursements > 0 ? r.week_principal_usd/r.week_disbursements : 0, 0),
+      dRev: '$' + fmt((parseFloat(r.week_principal_usd)||0)+(parseFloat(r.week_interest_usd)||0)+(parseFloat(r.week_fees_usd)||0), 0),
+      disbSub: 'Week &nbsp;·&nbsp; USD values at ' + exLabel,
+    }
+  };
+
+  // Update PAR 30 and Chronic in DOM directly (not period-dependent)
+  // Update PAR 30 and Chronic — try multiple field name formats
+  const par30Val = parseFloat(r.par30_rate || r['par30_rate'] || 0);
+  const chronicVal = parseFloat(r.chronic_rate || r['chronic_rate'] || 0);
+  console.log('PAR30:', par30Val, 'Chronic:', chronicVal, 'Row keys:', Object.keys(r).join(', '));
+
+  const par30Color = par30Val <= 5 ? 'var(--green)' : par30Val <= 10 ? 'var(--amber)' : 'var(--red)';
+  const chronicColor = chronicVal <= 5 ? 'var(--green)' : chronicVal <= 10 ? 'var(--amber)' : 'var(--red)';
+
+  document.querySelectorAll('[data-metric="par30"]').forEach(el => {
+    el.textContent = par30Val ? fmtPct(par30Val) : '—';
+    el.style.color = par30Color;
+  });
+  document.querySelectorAll('[data-metric="chronic"]').forEach(el => {
+    el.textContent = chronicVal ? fmtPct(chronicVal) : '—';
+    el.style.color = chronicColor;
+  });
+  document.querySelectorAll('[data-metric="par30-sub"]').forEach(el => { el.textContent = 'As at ' + formatDate(reportDate); });
+  document.querySelectorAll('[data-metric="chronic-sub"]').forEach(el => { el.textContent = 'YTD vs Jan 1 baseline'; });
+
+  // Update report date
+  // Parse report_date — Sheets returns "Date(2026,1,25)" where month is 0-indexed
+  if (r.report_date && typeof r.report_date === 'string' && r.report_date.startsWith('Date(')) {
+    const parts = r.report_date.replace('Date(','').replace(')','').split(',').map(Number);
+    reportDate = new Date(parts[0], parts[1], parts[2]);
+  } else {
+    reportDate = new Date(r.report_date);
+  }
+  // Replace raw date string with formatted version for display
+  const dateLabel = formatDate(reportDate);
+  r.report_date = dateLabel;
+  const dateInput = document.getElementById('report-date-input');
+  if (dateInput) dateInput.value = r.report_date;
+}
+
+async function loadLiveData() {
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=TZ_Results`;
+  try {
+    const res = await fetch(url);
+    const text = await res.text();
+    // Strip Google's JSONP wrapper
+    // Google wraps response in /*O_o*/ google.visualization.Query.setResponse({...});
+    const start = text.indexOf('{');
+    const end = text.lastIndexOf('}');
+    const json = JSON.parse(text.substring(start, end + 1));
+    const cols = json.table.cols.map(c => c.label);
+    const rows = json.table.rows;
+    if (!rows || rows.length === 0) return;
+
+    // Get latest row (last row)
+    const lastRow = rows[rows.length - 1];
+    const row = {};
+    cols.forEach((col, i) => {
+      const cell = lastRow.c[i];
+      row[col] = cell ? (cell.v !== null ? cell.v : '') : '';
+    });
+
+    liveRow = row;
+    buildDATA(row);
+    setView(currentView);
+    document.getElementById('data-source-note').textContent = 'Live data · Updated ' + new Date().toLocaleTimeString();
+  } catch(e) {
+    console.error('Failed to load live data:', e);
+    document.getElementById('data-source-note').textContent = 'Data load failed — showing last known values';
+  }
+}
+
+function setView(v) {
+  currentView = v;
+  const d = DATA[v];
+  const lbl = getDateLabels(v);
+  const viewName = v === 'week' ? 'Week' : v.toUpperCase();
+  ['mtd','ytd','week'].forEach(k => document.getElementById('btn-'+k).classList.toggle('active', k===v));
+  document.getElementById('period-label').innerHTML =
+    `Period: <strong>${lbl.current} (${viewName})</strong> &nbsp;·&nbsp; Prior: ${lbl.prior} &nbsp;·&nbsp; Defaults as at ${formatDate(reportDate)}`;
+  setText('kpi-apps', d.apps); setText('kpi-apps-sub', d.appsSub);
+  setText('kpi-approval', d.approval); setText('kpi-approval-sub', d.approvalSub);
+  setText('kpi-principal', d.principal); setText('kpi-principal-sub', d.principalSub);
+  setText('kpi-revenue', d.revenue); setText('kpi-revenue-sub', d.revenueSub);
+  setText('rev-interest', d.revInterest); setText('rev-interest-sub', d.revInterestSub);
+  setText('rev-fees', d.revFees); setText('rev-fees-sub', d.revFeesSub);
+  setText('rev-total', d.revTotal); setText('rev-total-sub', d.revTotalSub);
+  setText('f-sub', `Report totals &nbsp;·&nbsp; ${lbl.current} (${viewName})`);
+  setText('f-apps-val', d.fApps); setText('f-apps-pct', d.fApps_pct);
+  setText('f-apr-val', d.fApr);   setText('f-apr-pct', d.fApr_pct);
+  setText('f-disb-val', d.fDisb); setText('f-disb-pct', d.fDisb_pct);
+  setStyle('f-apr-bar', 'width', d.fApr_w);
+  setStyle('f-disb-bar', 'width', d.fDisb_w);
+  setText('disb-sub', `${lbl.current} (${viewName}) &nbsp;·&nbsp; USD values at TZS 2,640`);
+  setText('d-count', d.dCount); setText('d-principal', d.dPrincipal);
+  setText('d-interest', d.dInterest); setText('d-pi', d.dPI);
+  setText('d-fees', d.dFees); setText('d-avg', d.dAvg); setText('d-rev', d.dRev);
+}
+
+function formatDate(d) {
+  return d.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+}
+function formatDateShort(d) {
+  return d.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+}
+
+let reportDate = new Date('2026-02-25');
+let currentView = 'mtd';
+
+function onDateChange(val) {
+  reportDate = new Date(val);
+  // Date change — reload data for selected date
+  loadLiveData();
+  setView(currentView);
+}
+
+function getDateLabels(view) {
+  const rd = reportDate;
+  const year = rd.getFullYear();
+  const month = rd.getMonth();
+  const day = rd.getDate();
+
+  if (view === 'week') {
+    const ws  = new Date(rd); ws.setDate(day - 6);
+    const pws = new Date(ws); pws.setDate(ws.getDate() - 7);
+    const pwe = new Date(rd); pwe.setDate(day - 7);
+    return {
+      current:  `${formatDateShort(ws)} – ${formatDate(rd)}`,
+      prior:    `${formatDateShort(pws)} – ${formatDate(pwe)}`,
+      priorLabel: 'prior week'
+    };
+  } else if (view === 'mtd') {
+    const ms = new Date(year, month, 1);
+    const pms = new Date(year, month - 1, 1);
+    const pme = new Date(year, month - 1, day);
+    return {
+      current:  `${formatDateShort(ms)} – ${formatDate(rd)}`,
+      prior:    `${formatDateShort(pms)} – ${formatDate(pme)}`,
+      priorLabel: 'prior MTD'
+    };
+  } else {
+    const ys = new Date(year, 0, 1);
+    return {
+      current:  `Jan 1 – ${formatDate(rd)}`,
+      prior:    `Jan 1 – ${formatDateShort(rd).replace(String(year), String(year-1))} ${year-1}`,
+      priorLabel: 'prior YTD'
+    };
+  }
+}
+
+
+function setText(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = val;
+}
+function setStyle(id, prop, val) {
+  const el = document.getElementById(id);
+  if (el) el.style[prop] = val;
+}
+window.onload = () => {
+  setView('mtd');
+  loadLiveData();
+};
+</script>
+</body>
+</html>
